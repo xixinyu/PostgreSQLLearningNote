@@ -17,3 +17,12 @@
       v_idx = v_idx+1;
       end loop;
     end $$;
+
+
+
+
+
+
+
+insert into caregivergeom ("Id","OrganizationUnitId","StaffId","StaffFirstName","StaffLastName","StaffPhone","StaffEmail","Geom","LocationTime" )
+(select 'caregivergeoms/' ||  uuid_generate_v4(),"OrganizationUnitId","StaffId","StaffFirstName","StaffLastName","StaffPhone","StaffEmail","Geom",now() FROM caregivergeom limit 1);
