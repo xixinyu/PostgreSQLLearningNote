@@ -1,0 +1,19 @@
+   do $$
+    declare
+    v_idx integer := 1;
+    begin
+      while v_idx <  loop
+      insert into caregivergeom 
+            (select 'caregivergeoms/' ||  uuid_generate_v4(),
+            "OrganizationUnitId",
+            "StaffId",
+            "StaffFirstName",
+            "StaffLastName",
+            "StaffPhone",
+            "StaffEmail",
+            "Geom",
+            now() 
+           FROM caregivergeom limit 1);
+      v_idx = v_idx+1;
+      end loop;
+    end $$;
