@@ -1,22 +1,58 @@
-   do $$
+CREATE TABLE IF NOT EXISTS public.caregivergeom
+(
+    "Id" character varying COLLATE pg_catalog."default" NOT NULL,
+    "OrganizationUnitId" character varying COLLATE pg_catalog."default",
+    "StaffId" character varying COLLATE pg_catalog."default",
+    "StaffFirstName" character varying COLLATE pg_catalog."default",
+    "StaffLastName" character varying COLLATE pg_catalog."default",
+    "StaffPhone" character varying COLLATE pg_catalog."default",
+    "StaffEmail" character varying COLLATE pg_catalog."default",
+    "Geom" geometry(Point,4326),
+    "LocationTime" timestamp with time zone DEFAULT transaction_timestamp(),
+    CONSTRAINT caregivergeom_pkey PRIMARY KEY ("Id")
+)
+WITH (
+    OIDS = FALSE
+)
+TABLESPACE pg_default;
+
+ALTER TABLE public.caregivergeom
+    OWNER to postgres;
+   
+CREATE EXTENSION IF NOT EXISTS postgis;--need install postgis_2_5_pg10.exe
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";--create guid
+
+INSERT INTO caregivergeom VALUES('caregivergeoms/1c70e42b-477a-482c-ae4c-f8ec6b8fb352','organizationunits/71c51078-d2fc-49c0-943c-e7fd2d3ebd65',
+                                '633131098','John','Doe','888-888-8888','jiangfeng.zhang@feisystems.com',
+                                 ST_GeomFromText('POINT(32.3293933  -90.2046264)',4326),NOW())  on conflict ("Id") do nothing;
+
+ do $$
     declare
-    v_idx integer := 1;
+	n integer :=1;
+    i integer:= trunc(random()*(100-1)+1);
+	la double precision:= 32.329393+i;
+	lo double precision:=-90.2046264+i;
+	po character varying:= 'POINT('||la ||' ' ||lo||')';
     begin
-      while v_idx <  loop
+	while n < 10000 loop
+		i := trunc(random()*(100-1)+1);
+		la := 32.329393+i;
+		lo :=-90.2046264+i;
+		po := 'POINT('||la ||' ' ||lo||')';
       insert into caregivergeom 
-            (select 'caregivergeoms/' ||  uuid_generate_v4(),
-            "OrganizationUnitId",
-            "StaffId",
-            "StaffFirstName",
-            "StaffLastName",
-            "StaffPhone",
-            "StaffEmail",
-            "Geom",
-            now() 
-           FROM caregivergeom limit 1);
-      v_idx = v_idx+1;
-      end loop;
-    end $$;
+           values ('caregivergeoms/'||uuid_generate_v4(),
+            'OrganizationUnitId/'||uuid_generate_v4(),
+            'StaffId/'||uuid_generate_v4(),
+            'StaffFirstName'||i,
+            'StaffLastName'||i,
+            i::character varying||i::character varying||i::character varying,
+            'StaffEmail'||i||'@feisystems',
+            ST_GeomFromText(po,4326),
+            now());
+			n = n+1;
+			END LOOP;
+    end $$;                                                            
+
 
 
 
