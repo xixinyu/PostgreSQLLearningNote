@@ -1,0 +1,1 @@
+update mt_doc_priorauthorization set data = data || '{"WorkflowStatus":{"Name": "Denied","DisplayName": "Denied"}}'; 
