@@ -1,1 +1,2 @@
 update mt_doc_priorauthorization set data = data || '{"WorkflowStatus":{"Name": "Denied","DisplayName": "Denied"}}'; 
+这段代码只更新data字段中的WorkflowStatus
