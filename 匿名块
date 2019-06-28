@@ -1,0 +1,11 @@
+do 
+$$
+declare 
+bx boolean;
+begin 
+bx:= true;
+if bx then 
+create table client(col int);
+end if;
+end;
+$$
