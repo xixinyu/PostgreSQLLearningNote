@@ -1,0 +1,2 @@
+1.serviceactivitiestaffids = to_json((select array_agg(sa.staffid) from (select jsonb_array_elements(New.data->'ServiceActivities')->>'StaffId' As staffid) sa))
+2.serviceactivitiestaffids = to_json((select array_agg(sa.staffid) from (select jsonb_array_elements(data->'ServiceActivities')->>'StaffId' As staffid) sa))
