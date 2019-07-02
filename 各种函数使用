@@ -2,3 +2,7 @@
 1.json_agg(): Using json_agg() aggregate table data into a JSON formatted array 
               https://www.dbrnd.com/2016/03/postgresql-using-json_agg-aggregate-table-data-into-a-json-formatted-array/
 2.row_to_json():将每一行的结果组合成json
+3.copy: 将查询结果导出到指定文件，此文件需已经存在
+      copy(select json_agg(t.data)
+       from 
+      (select data from mt_doc_lookupitem where data->>'Category' like '%lxservicemodifiers%') as t) to 'D:\query.json'
