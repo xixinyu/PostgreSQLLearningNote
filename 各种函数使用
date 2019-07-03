@@ -6,3 +6,7 @@
       copy(select json_agg(t.data)
        from 
       (select data from mt_doc_lookupitem where data->>'Category' like '%lxservicemodifiers%') as t) to 'D:\query.json'
+4.varchar_pattern_ops 给模糊查询的字段创建索引时使用
+  CREATE INDEX client_middlename_btree_index
+  ON public.mt_doc_client USING btree(lower(middlename) varchar_pattern_ops);
+5.
