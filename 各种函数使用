@@ -10,4 +10,10 @@
 4.varchar_pattern_ops 给模糊查询的字段创建索引时使用
   CREATE INDEX client_middlename_btree_index
   ON public.mt_doc_client USING btree(lower(middlename) varchar_pattern_ops);
-5.
+5.随机生成单个字符：
+                chr(int4(random()*26)+65)||lower(chr(int4(random()*26)+65))||lower(chr(int4(random()*26)+65))||lower(chr(int4(random()*26)+65))||lower(chr(int4(random()*26)+65))||lower(chr(int4(random()*26)+65))||lower(chr(int4(random()*26)+65))
+                https://www.cnblogs.com/gaojian/archive/2012/11/09/2762205.html
+6.生成guid：
+        1.create extension "uuid-ossp"
+        2.select uuid_generate_v4()
+        https://blog.csdn.net/a258831020/article/details/47186063
