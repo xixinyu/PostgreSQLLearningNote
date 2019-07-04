@@ -1,5 +1,6 @@
 关于数据库的博客：https://www.dbrnd.com/
                 https://yq.aliyun.com/users/3x5dm5sgv4yq6?spm=a2c4e.11153940.0.0.5d283214nET8EX
+                https://yq.aliyun.com/articles/672261?spm=a2c4e.11163080.searchblog.9.21712ec1JlbUGh
 1.json_agg(): Using json_agg() aggregate table data into a JSON formatted array 
               https://www.dbrnd.com/2016/03/postgresql-using-json_agg-aggregate-table-data-into-a-json-formatted-array/
 2.row_to_json():将每一行的结果组合成json
