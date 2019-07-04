@@ -1,0 +1,159 @@
+
+ALTER TABLE IF EXISTS mt_doc_client 
+	 DROP COLUMN IF EXISTS FirstName
+	,DROP COLUMN IF EXISTS MiddleName
+	,DROP COLUMN IF EXISTS LastName
+	,DROP COLUMN IF EXISTS ClientIdentifier
+	,DROP COLUMN IF EXISTS ClientSocialSecurityIdentifier
+	,DROP COLUMN IF EXISTS MedicalAssistanceEligibilityNumbers
+	,drop column if exists primaryphonenumber
+	,drop column if exists clientcurrentaddressid
+	,drop column if exists providerprofileid
+	,drop column if exists clientjurisdictionid
+	,drop column if exists legacyids
+	,drop column if exists dateofbirth
+	,drop column if exists clientphones;
+
+ALTER TABLE IF EXISTS mt_doc_client 
+     ADD COLUMN FirstName CHARACTER VARYING
+    ,ADD COLUMN MiddleName CHARACTER VARYING
+    ,ADD COLUMN LastName CHARACTER VARYING
+    ,ADD COLUMN ClientIdentifier CHARACTER VARYING
+    ,ADD COLUMN ClientSocialSecurityIdentifier CHARACTER VARYING
+    ,ADD COLUMN MedicalAssistanceEligibilityNumbers jsonb
+    ,add column primaryphonenumber character varying
+    ,add column clientcurrentaddressid character varying
+	,add column providerprofileid character varying
+	,add column clientjurisdictionid character varying
+	,add column legacyids jsonb
+	,add column dateofbirth timestamp with time zone
+    ,add column clientphones jsonb;
+
+	
+
+-- ************************************************************************
+-- * update_client trigger                                                *
+-- ************************************************************************
+
+/*CREATE OR REPLACE FUNCTION update_client()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100.0
+    VOLATILE NOT LEAKPROOF 
+AS $BODY$
+
+  BEGIN
+	UPDATE mt_doc_client
+	SET 	firstname = New.data -> 'ClientProfile' -> 'PersonName' ->> 'FirstName'
+	        ,middlename = New.data -> 'ClientProfile' -> 'PersonName' ->> 'MiddleName'
+		,lastname = New.data -> 'ClientProfile' -> 'PersonName' ->> 'LastName'
+		,clientidentifier = New.data -> 'ClientProfile' ->> 'ClientIdentifier'
+		,clientsocialsecurityidentifier = New.data -> 'ClientProfile' ->> 'ClientSocialSecurityIdentifier'
+		,medicalassistanceeligibilitynumbers = New.data -> 'MedicalAssistanceEligibilityNumbers'
+		,primaryphonenumber = New.data->'PrimaryPhone'->'Phone'->>'Number'
+		,clientcurrentaddressid = New.data->>'ClientCurrentAddressId'
+		,providerprofileid = New.data->>'ProviderProfileId'
+		,clientjurisdictionid = New.data->'ClientJurisdiction'->>'Id'
+		,legacyids = New.data->'LegacyIds'
+		,dateofbirth = (New.data->'ClientProfile'->>'DateOfBirth')::timestamp with time zone
+		,clientphones = New.data->'ClientPhones'
+	WHERE id = New.id;
+
+	RETURN New;
+  END;
+$BODY$;
+ALTER FUNCTION update_client () OWNER TO postgres;
+
+DROP TRIGGER IF EXISTS update_client ON mt_doc_client;
+
+CREATE TRIGGER update_client
+    AFTER INSERT OR UPDATE OF data ON mt_doc_client
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_client();*/
+	
+	
+	
+
+-- Index: client_firstname_btree_index
+
+DROP INDEX IF EXISTS public.client_firstname_btree_index;    
+CREATE INDEX client_firstname_btree_index
+ON public.mt_doc_client USING btree(lower(firstname));
+
+-- Index: client_middlename_btree_index
+
+DROP INDEX IF EXISTS public.client_middlename_btree_index;    
+CREATE INDEX client_middlename_btree_index
+ON public.mt_doc_client USING btree(lower(middlename));
+
+-- Index: client_lastname_btree_index
+
+DROP INDEX IF EXISTS public.client_lastname_btree_index;    
+CREATE INDEX client_lastname_btree_index
+ON public.mt_doc_client USING btree(lower(lastname));
+
+-- Index: client_clientidentifier_btree_index
+
+DROP INDEX IF EXISTS public.client_clientidentifier_btree_index;    
+CREATE INDEX client_clientidentifier_btree_index
+ON public.mt_doc_client USING btree(lower(clientidentifier));
+
+-- Index: client_clientsocialsecurityidentifier_btree_index
+
+DROP INDEX IF EXISTS public.client_clientsocialsecurityidentifier_btree_index;    
+CREATE INDEX client_clientsocialsecurityidentifier_btree_index
+ON public.mt_doc_client USING btree(clientsocialsecurityidentifier);
+
+-- Index: client_currentmedicaidnumber_btree_index
+    
+DROP INDEX IF EXISTS public.client_medicalassistanceeligibilitynumbers_gin_index;
+CREATE INDEX client_medicalassistanceeligibilitynumbers_gin_index
+    ON public.mt_doc_client USING gin(medicalassistanceeligibilitynumbers jsonb_path_ops);
+
+DROP INDEX IF EXISTS public.client_primaryphonenumber_btree_index;
+CREATE INDEX client_primaryphonenumber_btree_index
+    ON public.mt_doc_client USING btree(primaryphonenumber);    
+
+DROP INDEX IF EXISTS public.client_clientcurrentaddressid_btree_index;
+CREATE INDEX client_clientcurrentaddressid_btree_index
+    ON public.mt_doc_client USING btree(clientcurrentaddressid);
+
+
+DROP INDEX IF EXISTS public.client_providerprofileid_btree_index;
+CREATE INDEX client_providerprofileid_btree_index
+    ON public.mt_doc_client USING btree(providerprofileid);
+
+DROP INDEX IF EXISTS public.client_clientjurisdictionid_btree_index;
+CREATE INDEX client_clientjurisdictionid_btree_index
+    ON public.mt_doc_client USING btree(clientjurisdictionid);
+	
+DROP INDEX IF EXISTS public.client_legacyids_btree_index;
+CREATE INDEX client_legacyids_btree_index
+    ON public.mt_doc_client USING btree(legacyids);
+	
+DROP INDEX IF EXISTS public.client_dateofbirth_btree_index;
+CREATE INDEX client_dateofbirth_btree_index
+    ON public.mt_doc_client USING btree(dateofbirth);
+	
+DROP INDEX IF EXISTS public.client_clientphones_gin_index;
+CREATE INDEX client_clientphones_gin_index
+    ON public.mt_doc_client USING gin(clientphones jsonb_path_ops);      
+	
+
+-- ************************************************************************
+-- * DataPatch for old data                                               *
+-- ************************************************************************
+/*UPDATE mt_doc_client
+SET firstname = data -> 'ClientProfile' -> 'PersonName' ->> 'FirstName',
+	middlename = data -> 'ClientProfile' -> 'PersonName' ->> 'MiddleName',
+	lastname = data -> 'ClientProfile' -> 'PersonName' ->> 'LastName',
+	clientidentifier = data -> 'ClientProfile' ->> 'ClientIdentifier',
+	clientsocialsecurityidentifier = data -> 'ClientProfile' ->> 'ClientSocialSecurityIdentifier',
+	medicalassistanceeligibilitynumbers = data -> 'MedicalAssistanceEligibilityNumbers',
+	primaryphonenumber = data->'PrimaryPhone'->'Phone'->>'Number',
+	clientcurrentaddressid = data->>'ClientCurrentAddressId',
+	providerprofileid = data->>'ProviderProfileId',
+	clientjurisdictionid = data->'ClientJurisdiction'->>'Id',
+	legacyids = data->'LegacyIds',
+	dateofbirth = (data->'ClientProfile'->>'DateOfBirth')::timestamp with time zone,
+	clientphones = data->'ClientPhones';*/
