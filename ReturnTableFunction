@@ -1,0 +1,43 @@
+create or replace function GetUserProfileBySsoId(p_ssoid character varying)
+RETURNS table
+(
+	    r_userid character varying,
+		r_firstname character varying,
+		r_lastname character varying,
+		r_ouid character varying,
+		r_oubusinessname character varying,
+		r_email character varying,
+		r_staffidentifier character varying
+)		
+as
+$$ 
+declare 
+		d_userid character varying ;
+		d_firstname character varying;
+		d_lastname character varying;
+		d_ouid character varying;
+		d_oubusinessname character varying;
+		d_email character varying;
+		d_staffidentifier character varying;
+begin
+	 select  s.id,
+			 s.firstname,
+			 s.lastname,
+			 s.organizationunitid,
+			 ua.ssoemail 
+	 into d_userid,d_firstname,d_lastname,d_ouid,d_email 
+	 from mt_doc_staff s 
+	 INNER JOIN mt_doc_useraccount ua ON s.id = ua.userid
+	 where  ua.l_ssoid = p_ssoid;
+	 if(d_userid is null)
+	 then return ;
+	 end if;
+	 select ou.businessname INTO d_oubusinessname from mt_doc_organizationunit ou Where id = d_ouid;
+	 
+	 SELECT e.uniqueninedigitsid INTO d_staffidentifier FROM mt_doc_staffextension e WHERE e.staffid = d_userid;
+	 
+	 return query select d_userid,d_firstname,d_lastname,d_ouid,d_oubusinessname,d_email,d_staffidentifier ;
+end $$
+language plpgsql;
+
+ select * from GetUserProfileBySsoId('rolftujague')
